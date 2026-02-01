@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Từ Điển Thành Ngữ Trung Việt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-container.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            overflow-x: auto;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            margin-right: 8px;
+            border: none;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tab:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .view-mode-toggle {
+            padding: 10px 20px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .view-mode-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 20px;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .idiom-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .idiom-card:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .idiom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .idiom-title {
+            flex: 1;
+        }
+
+        .idiom-chinese {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .idiom-pinyin {
+            font-size: 15px;
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-btn.active {
+            animation: heartBeat 0.5s ease;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+        }
+
+        .tags-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .meaning-section {
+            margin: 15px 0;
+        }
+
+        .meaning-chinese {
+            font-size: 15px;
+            color: #ff9800;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .meaning-vietnamese {
+            font-size: 15px;
+            color: #2c3e50;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .examples-section {
+            margin-top: 15px;
+        }
+
+        .example-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .example-toggle:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .examples-content {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .examples-content.show {
+            display: block;
+            animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .example-item {
+            margin: 8px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #2196f3;
+        }
+
+        .example-text {
+            font-size: 15px;
+            color: #2196f3;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .synonyms-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fff8e1;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .synonyms-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f57c00;
+            margin-bottom: 8px;
+        }
+
+        .synonym-item {
+            display: inline-block;
+            margin: 4px 8px 4px 0;
+            font-size: 15px;
+            color: #e65100;
+            font-weight: 600;
+        }
+
+        .story-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 10px;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .story-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #9c27b0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .story-content {
+            font-size: 14px;
+            color: #4a148c;
+            line-height: 1.8;
+        }
+
+        .stats {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 13px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .settings-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 20px;
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-item {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .setting-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .setting-value {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .practice-section {
+            padding: 20px;
+        }
+
+        .practice-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .practice-question {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .practice-chinese {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .practice-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .practice-option {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .practice-option:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .practice-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .practice-option.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .practice-controls {
+            margin-top: 20px;
+        }
+
+        .practice-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .practice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .practice-score {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        /* Compact View Mode */
+        .idiom-card.compact {
+            padding: 15px;
+        }
+
+        .idiom-card.compact .idiom-chinese {
+            font-size: 21px;
+        }
+
+        .idiom-card.compact .idiom-pinyin,
+        .idiom-card.compact .meaning-vietnamese {
+            font-size: 14px;
+        }
+
+        .idiom-card.compact .example-item {
+            margin: 5px 0;
+            padding: 8px;
+        }
+
+        .idiom-card.compact .tags-container,
+        .idiom-card.compact .meaning-chinese {
+            display: none;
+        }
+
+        .idiom-card.compact .synonyms-section {
+            padding: 8px;
+            margin-top: 10px;
+        }
+
+        .idiom-card.compact .example-text {
+            font-size: 14px;
+        }
+
+        .idiom-card.compact .examples-content {
+            display: block;
+        }
+
+        .idiom-card.compact .examples-content .example-item:not(:first-child) {
+            display: none;
+        }
+
+        .idiom-card.compact .example-toggle,
+        .idiom-card.compact .story-section {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .idiom-chinese {
+                font-size: 20px;
+            }
+
+            .tabs {
+                padding: 8px 10px;
+            }
+
+            .tab {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+
+            .practice-options {
+                grid-template-columns: 1fr;
+            }
+
+            .practice-chinese {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Từ Điển Thành Ngữ Trung Việt</h1>
+            <p>1500+ Thành Ngữ & Quán Dụng Ngữ</p>
+        </div>
+
+        <div class="search-container" id="searchContainer">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm thành ngữ...">
+                <span class="search-icon">⌕</span>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabs">
+            <button class="tab active" onclick="switchTab('all')">📖 Tất cả</button>
+            <button class="tab" onclick="switchTab('hsk6')">🎯 HSK 6</button>
+            <button class="tab" onclick="switchTab('hsk79')">🏆 HSK 7-9</button>
+            <button class="tab" onclick="switchTab('gushi')">📜 Câu chuyện</button>
+            <button class="tab" onclick="switchTab('favorites')">❤️ Yêu thích</button>
+            <button class="tab" onclick="switchTab('practice')">✏️ Luyện tập</button>
+            <button class="tab" onclick="switchTab('settings')">⚙️ Cài đặt</button>
+        </div>
+
+        <div class="view-mode-toggle" id="viewModeToggle">
+            <button class="view-mode-btn active" onclick="setViewMode('full')">📋 Đầy đủ</button>
+            <button class="view-mode-btn" onclick="setViewMode('compact')">📝 Rút gọn</button>
+        </div>
+
+        <div class="content" id="content">
+            <div class="loading">⏳ Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let hsk6Data = [];
+        let hsk79Data = [];
+        let gushiData = [];
+        let currentTab = 'all';
+        let currentViewMode = 'full';
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        let lastScrollTop = 0;
+        let practiceMode = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            total: 0
+        };
+
+        // Load all data files
+        async function loadData() {
+            try {
+                const [data1, data2, data3, data4] = await Promise.all([
+                    fetch('thanhngu3chu.json').then(r => r.json()),
+                    fetch('hsk6.json').then(r => r.json()),
+                    fetch('hsk79.json').then(r => r.json()),
+                    fetch('gushi.json').then(r => r.json())
+                ]);
+
+                allData = data1;
+                hsk6Data = data2;
+                hsk79Data = data3;
+                gushiData = data4;
+
+                displayData();
+            } catch (error) {
+                document.getElementById('content').innerHTML = 
+                    '<div class="loading" style="color: #f44336;">❌ Lỗi tải dữ liệu. Vui lòng kiểm tra file JSON.</div>';
+            }
+        }
+
+        function displayData() {
+            let data = [];
+            const content = document.getElementById('content');
+
+            switch(currentTab) {
+                case 'all':
+                    data = allData;
+                    break;
+                case 'hsk6':
+                    data = hsk6Data;
+                    break;
+                case 'hsk79':
+                    data = hsk79Data;
+                    break;
+                case 'gushi':
+                    data = gushiData;
+                    break;
+                case 'favorites':
+                    data = getFavoriteData();
+                    break;
+                case 'practice':
+                    displayPractice();
+                    return;
+                case 'settings':
+                    displaySettings();
+                    return;
+            }
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                data = data.filter(item => {
+                    const chinese = (item['THÀNH NGỮ'] || item['Thành ngữ'] || '').toLowerCase();
+                    const pinyin = (item['PINYIN'] || item['Pinyin'] || '').toLowerCase();
+                    const meaning = (item['NGHĨA'] || '').toLowerCase();
+                    return chinese.includes(searchTerm) || pinyin.includes(searchTerm) || meaning.includes(searchTerm);
+                });
+            }
+
+            if (data.length === 0) {
+                content.innerHTML = '<div class="loading">😔 Không tìm thấy kết quả</div>';
+                return;
+            }
+
+            let html = '';
+            data.forEach((item, index) => {
+                html += renderIdiomCard(item, index);
+            });
+
+            html += `<div class="stats">📊 Hiển thị ${data.length} thành ngữ</div>`;
+            content.innerHTML = html;
+        }
+
+        function renderIdiomCard(item, index) {
+            const chinese = item['THÀNH NGỮ'] || item['Thành ngữ'] || '';
+            const pinyin = item['PINYIN'] || item['Pinyin'] || '';
+            const meaning = item['NGHĨA'] || '';
+            const meaningChinese = item['释义'] || '';
+            const story = item['câu chuyện thành ngữ'] || '';
+            const isFavorite = favorites.includes(chinese);
+            
+            const compactClass = currentViewMode === 'compact' ? 'compact' : '';
+            
+            // Check if has story in gushiData
+            const hasStory = gushiData.some(g => (g['THÀNH NGỮ'] || g['Thành ngữ']) === chinese);
+            
+            // Get tags
+            let tags = '';
+            if (currentTab === 'hsk6' || hsk6Data.some(h => (h['Thành ngữ']) === chinese)) {
+                tags += '<span class="tag">HSK 6</span>';
+            }
+            if (currentTab === 'hsk79' || hsk79Data.some(h => (h['Thành ngữ']) === chinese)) {
+                tags += '<span class="tag">HSK 7-9</span>';
+            }
+
+            // Examples
+            let examples = '';
+            const ex1 = item['Ví dụ 1'] || '';
+            const ex2 = item['Ví dụ 2'] || '';
+            if (ex1) examples += `<div class="example-item"><div class="example-text">${ex1}</div></div>`;
+            if (ex2) examples += `<div class="example-item"><div class="example-text">${ex2}</div></div>`;
+
+            // Synonyms
+            let synonyms = '';
+            const syn1 = item['Đồng nghĩa 1'] || item['GẦN NGHĨA 1'] || item['Đồng nghĩa 2'] || '';
+            const syn2 = item['Đồng nghĩa 2'] || item['GẦN NGHĨA 2'] || '';
+            if (syn1 || syn2) {
+                synonyms = `
+                    <div class="synonyms-section">
+                        <div class="synonyms-title">💫 Từ đồng nghĩa</div>
+                        ${syn1 ? `<span class="synonym-item">${syn1}</span>` : ''}
+                        ${syn2 ? `<span class="synonym-item">${syn2}</span>` : ''}
+                    </div>
+                `;
+            }
+
+            // Story section
+            let storyHtml = '';
+            if (hasStory && story) {
+                storyHtml = `
+                    <div class="story-section">
+                        <div class="story-title">📖 Câu chuyện thành ngữ</div>
+                        <div class="story-content">${story}</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="idiom-card ${compactClass}" data-index="${index}">
+                    <div class="idiom-header">
+                        <div class="idiom-title">
+                            <div class="idiom-chinese">${chinese}</div>
+                            <div class="idiom-pinyin">${pinyin}</div>
+                        </div>
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${chinese}', event)">
+                            ${isFavorite ? '❤️' : '🤍'}
+                        </button>
+                    </div>
+                    
+                    ${tags ? `<div class="tags-container">${tags}</div>` : ''}
+                    
+                    <div class="meaning-section">
+                        ${meaningChinese ? `<div class="meaning-chinese">${meaningChinese}</div>` : ''}
+                        <div class="meaning-vietnamese">🇻🇳 ${meaning}</div>
+                    </div>
+                    
+                    ${synonyms}
+                    
+                    ${examples && currentViewMode !== 'compact' ? `
+                        <div class="examples-section">
+                            <button class="example-toggle" onclick="toggleExamples(${index})">
+                                📝 Xem ví dụ
+                            </button>
+                            <div class="examples-content" id="examples-${index}">
+                                ${examples}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${currentViewMode === 'compact' && ex1 ? `
+                        <div class="examples-content show">
+                            <div class="example-item"><div class="example-text">${ex1}</div></div>
+                        </div>
+                    ` : ''}
+                    
+                    ${storyHtml}
+                </div>
+            `;
+        }
+
+        function toggleExamples(index) {
+            const element = document.getElementById(`examples-${index}`);
+            element.classList.toggle('show');
+        }
+
+        function toggleFavorite(chinese, event) {
+            event.stopPropagation();
+            const index = favorites.indexOf(chinese);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(chinese);
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            displayData();
+        }
+
+        function getFavoriteData() {
+            const allCombined = [...allData, ...hsk6Data, ...hsk79Data, ...gushiData];
+            const unique = [];
+            const seen = new Set();
+            
+            allCombined.forEach(item => {
+                const chinese = item['THÀNH NGỮ'] || item['Thành ngữ'] || '';
+                if (favorites.includes(chinese) && !seen.has(chinese)) {
+                    seen.add(chinese);
+                    unique.push(item);
+                }
+            });
+            
+            return unique;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Hide view mode toggle for practice and settings
+            const viewModeToggle = document.getElementById('viewModeToggle');
+            if (tab === 'practice' || tab === 'settings') {
+                viewModeToggle.style.display = 'none';
+            } else {
+                viewModeToggle.style.display = 'block';
+            }
+            
+            displayData();
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.view-mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            displayData();
+        }
+
+        function displaySettings() {
+            document.getElementById('content').innerHTML = `
+                <div class="settings-section">
+                    <div class="settings-title">⚙️ Cài đặt</div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">📚 Nguồn dữ liệu</div>
+                        <div class="setting-value">Từ Điển Thành Ngữ & Quán Dụng Ngữ Trung Việt</div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">📊 Tổng số thành ngữ</div>
+                        <div class="setting-value">
+                            • Thành ngữ 3 chữ: ${allData.length} mục<br>
+                            • HSK 6: ${hsk6Data.length} mục<br>
+                            • HSK 7-9: ${hsk79Data.length} mục<br>
+                            • Câu chuyện: ${gushiData.length} mục<br>
+                            • Yêu thích: ${favorites.length} mục
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">👨‍💻 Nhà phát triển</div>
+                        <div class="setting-value">Hoàng Minh Đức</div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">ℹ️ Phiên bản</div>
+                        <div class="setting-value">v2.0 - Nâng cấp giao diện & tính năng</div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">✨ Tính năng mới</div>
+                        <div class="setting-value">
+                            • 🎯 Luyện tập thành ngữ<br>
+                            • 📝 Chế độ xem rút gọn<br>
+                            • ❤️ Đánh dấu yêu thích<br>
+                            • 🔍 Tìm kiếm thông minh<br>
+                            • 📖 Câu chuyện thành ngữ<br>
+                            • 🎨 Giao diện hiện đại
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayPractice() {
+            if (practiceMode.questions.length === 0) {
+                startNewPractice();
+            } else {
+                showPracticeQuestion();
+            }
+        }
+
+        function startNewPractice() {
+            // Get random 10 idioms
+            const allCombined = [...allData, ...hsk6Data, ...hsk79Data];
+            const shuffled = allCombined.sort(() => 0.5 - Math.random());
+            practiceMode.questions = shuffled.slice(0, 10);
+            practiceMode.currentIndex = 0;
+            practiceMode.score = 0;
+            practiceMode.total = 0;
+            showPracticeQuestion();
+        }
+
+        function showPracticeQuestion() {
+            if (practiceMode.currentIndex >= practiceMode.questions.length) {
+                showPracticeResult();
+                return;
+            }
+
+            const question = practiceMode.questions[practiceMode.currentIndex];
+            const chinese = question['THÀNH NGỮ'] || question['Thành ngữ'] || '';
+            const correctAnswer = question['NGHĨA'] || '';
+            
+            // Get 3 random wrong answers
+            const allCombined = [...allData, ...hsk6Data, ...hsk79Data];
+            const wrongAnswers = allCombined
+                .filter(item => (item['NGHĨA'] || '') !== correctAnswer)
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 3)
+                .map(item => item['NGHĨA'] || '');
+            
+            const options = [correctAnswer, ...wrongAnswers].sort(() => 0.5 - Math.random());
+
+            document.getElementById('content').innerHTML = `
+                <div class="practice-section">
+                    <div class="practice-card">
+                        <div class="practice-question">❓ Thành ngữ này nghĩa là gì?</div>
+                        <div class="practice-chinese">${chinese}</div>
+                        <div class="practice-score">
+                            📊 Câu ${practiceMode.currentIndex + 1}/10 | 
+                            🎯 Điểm: ${practiceMode.score}/${practiceMode.total}
+                        </div>
+                        <div class="practice-options">
+                            ${options.map((opt, i) => `
+                                <div class="practice-option" onclick="checkAnswer('${opt.replace(/'/g, "\\'")}', '${correctAnswer.replace(/'/g, "\\'")}', this)">
+                                    ${opt}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="practice-controls">
+                            <button class="practice-btn" onclick="skipQuestion()">⏭️ Bỏ qua</button>
+                            <button class="practice-btn" onclick="startNewPractice()">🔄 Làm lại</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkAnswer(selected, correct, element) {
+            practiceMode.total++;
+            
+            if (selected === correct) {
+                element.classList.add('correct');
+                practiceMode.score++;
+                setTimeout(() => {
+                    practiceMode.currentIndex++;
+                    showPracticeQuestion();
+                }, 1000);
+            } else {
+                element.classList.add('wrong');
+                // Highlight correct answer
+                document.querySelectorAll('.practice-option').forEach(opt => {
+                    if (opt.textContent.trim() === correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+                setTimeout(() => {
+                    practiceMode.currentIndex++;
+                    showPracticeQuestion();
+                }, 2000);
+            }
+            
+            // Disable all options
+            document.querySelectorAll('.practice-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+        }
+
+        function skipQuestion() {
+            practiceMode.total++;
+            practiceMode.currentIndex++;
+            showPracticeQuestion();
+        }
+
+        function showPracticeResult() {
+            const percentage = Math.round((practiceMode.score / practiceMode.total) * 100);
+            let emoji = '🎉';
+            let message = 'Xuất sắc!';
+            
+            if (percentage < 50) {
+                emoji = '💪';
+                message = 'Cố gắng lên!';
+            } else if (percentage < 80) {
+                emoji = '👍';
+                message = 'Tốt lắm!';
+            }
+
+            document.getElementById('content').innerHTML = `
+                <div class="practice-section">
+                    <div class="practice-card">
+                        <div style="font-size: 64px; margin: 20px 0;">${emoji}</div>
+                        <div class="practice-question">${message}</div>
+                        <div class="practice-score" style="font-size: 24px; margin: 20px 0;">
+                            Kết quả: ${practiceMode.score}/${practiceMode.total} 
+                            (${percentage}%)
+                        </div>
+                        <div class="practice-controls">
+                            <button class="practice-btn" onclick="startNewPractice()">🔄 Làm lại</button>
+                            <button class="practice-btn" onclick="switchTab('all'); displayData();">📚 Về trang chủ</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            displayData();
+        });
+
+        // Auto-hide search bar on scroll
+        const content = document.getElementById('content');
+        const searchContainer = document.getElementById('searchContainer');
+        
+        content.addEventListener('scroll', function() {
+            const scrollTop = content.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                searchContainer.classList.add('hidden');
+            } else {
+                searchContainer.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
